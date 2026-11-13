@@ -374,9 +374,10 @@
   var cashBalanceCache = {};   // courierId -> balance in piasters (null = fetch failed)
 
   // ---- Rider code: tries the common code-like fields on the courier object, falls back to the numeric id ----
-  // Rider code = Hurrier "User ID" = courier.id
+  // Rider code = courier.user_id (falls back to courier.id)
   var codeCache = {};
   function extractCode(c) {
+    if (c.user_id != null && c.user_id !== '') return String(c.user_id);
     return c.id != null ? String(c.id) : '';
   }
   function codeOf(r) {
@@ -1194,7 +1195,7 @@
       Object.keys(groups).sort().forEach(function (pl) {
         var plRows = groups[pl].map(function (r) {
           return {
-            Code: codeOf(r), Name: r.name,
+            'User ID': codeOf(r), 'Courier ID': r.id, Name: r.name,
             Phone: r.phone,
             Zone: r.zone,
             '3PL': r.contract,
@@ -1234,7 +1235,7 @@
       Object.keys(groups).sort().forEach(function (pl) {
         var rows = groups[pl].map(function (r) {
           return {
-            Code: codeOf(r), Name: r.name, Phone: r.phone, Zone: r.zone, Status: r.status, 'Active Orders': r.activeOrders,
+            'User ID': codeOf(r), 'Courier ID': r.id, Name: r.name, Phone: r.phone, Zone: r.zone, Status: r.status, 'Active Orders': r.activeOrders,
             Shifts: r.flowShiftCount != null ? r.flowShiftCount : '', Working: fmtFlowMin(r.flowWorkingMin),
             'Break Total': fmtFlowMin(r.flowBreakMin), 'Break Count': r.flowBreakCount != null ? r.flowBreakCount : '',
             'Auto Break': fmtFlowMin(r.flowAutoBreakMin), 'Courier Break': fmtFlowMin(r.flowCourierBreakMin),
@@ -1275,7 +1276,7 @@
       Object.keys(groups).sort().forEach(function (pl) {
         var plRows = groups[pl].map(function (r) {
           return {
-            Code: codeOf(r), Name: r.name, Phone: r.phone, Zone: r.zone, Status: r.status,
+            'User ID': codeOf(r), 'Courier ID': r.id, Name: r.name, Phone: r.phone, Zone: r.zone, Status: r.status,
             Shifts: r.flowShiftCount != null ? r.flowShiftCount : '', Working: fmtFlowMin(r.flowWorkingMin),
             'Break Total': fmtFlowMin(r.flowBreakMin), 'Break Count': r.flowBreakCount != null ? r.flowBreakCount : '',
             'Auto Break': fmtFlowMin(r.flowAutoBreakMin), 'Courier Break': fmtFlowMin(r.flowCourierBreakMin),
@@ -1337,7 +1338,7 @@
             var f = flowCache[r.id];
             var ok = f && !f.error;
             return {
-              Code: codeOf(r), Name: r.name, Phone: r.phone, Zone: r.zone, 'Current Status': r.lastStatus,
+              'User ID': codeOf(r), 'Courier ID': r.id, Name: r.name, Phone: r.phone, Zone: r.zone, 'Current Status': r.lastStatus,
               'Shift Time So Far': fmtHrs(r.shiftHoursSoFar),
               'Orders Today (approx.)': r.approxOrderCount,
               Shifts: ok && f.shiftCount != null ? f.shiftCount : '',
@@ -1447,7 +1448,7 @@
       var groups = groupBy3PL(rows);
       Object.keys(groups).sort().forEach(function (pl) {
         var plRows = groups[pl].map(function (r) {
-          var row = { Code: codeOf(r), Name: r.name, Phone: r.phone, Zone: r.zone, 'Days Late This Week': r.daysLateCount, 'Total Late Episodes This Week': r.totalLateEpisodes };
+          var row = { 'User ID': codeOf(r), 'Courier ID': r.id, Name: r.name, Phone: r.phone, Zone: r.zone, 'Days Late This Week': r.daysLateCount, 'Total Late Episodes This Week': r.totalLateEpisodes };
           dateKeysOldFirst.forEach(function (dk) {
             row[dk + ' (count)'] = r.perDay[dk] || 0;
             var times = r.perDayTimes[dk] || [];
@@ -1516,7 +1517,7 @@
       var groups = groupBy3PL(rows);
       Object.keys(groups).sort().forEach(function (pl) {
         var plRows = groups[pl].map(function (r) {
-          var row = { Code: codeOf(r), Name: r.name, Phone: r.phone, Zone: r.zone };
+          var row = { 'User ID': codeOf(r), 'Courier ID': r.id, Name: r.name, Phone: r.phone, Zone: r.zone };
           row[opts.daysLabel] = r.daysCount;
           row[opts.valueLabel] = opts.valueFmt(r.totalValue);
           dateKeysOldFirst.forEach(function (dk) {
@@ -1587,7 +1588,7 @@
         .sort(function (a, b) { return b.totalIdleMs - a.totalIdleMs; });
       var idleSheetRows = idleRecords.map(function (r) {
         return {
-          Code: codeOf(r), Name: r.name, Phone: r.phone, Zone: r.zone, '3PL': r.contract,
+          'User ID': codeOf(r), 'Courier ID': r.id, Name: r.name, Phone: r.phone, Zone: r.zone, '3PL': r.contract,
           'Total Idle Today': fmtMins(r.totalIdleMs),
           'Times Idle': r.timesIdle,
           'Longest Idle Streak': fmtMins(r.longestIdleMs),
@@ -1606,7 +1607,7 @@
       });
       var lowOrderSheetRows = lowOrderRecords.map(function (r) {
         return {
-          Code: codeOf(r), Name: r.name, Phone: r.phone, Zone: r.zone, '3PL': r.contract,
+          'User ID': codeOf(r), 'Courier ID': r.id, Name: r.name, Phone: r.phone, Zone: r.zone, '3PL': r.contract,
           'Shift Time So Far': fmtHrs(r.shiftHoursSoFar),
           'Orders Today (approx.)': r.approxOrderCount,
           'Current Status': r.lastStatus
