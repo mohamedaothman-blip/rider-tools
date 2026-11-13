@@ -374,14 +374,10 @@
   var cashBalanceCache = {};   // courierId -> balance in piasters (null = fetch failed)
 
   // ---- Rider code: tries the common code-like fields on the courier object, falls back to the numeric id ----
-  var CODE_FIELDS = ['external_id', 'employee_id', 'rider_code', 'courier_code', 'code', 'external_courier_id', 'username', 'id'];
+  // Rider code = Hurrier "User ID" = courier.id
   var codeCache = {};
   function extractCode(c) {
-    for (var i = 0; i < CODE_FIELDS.length; i++) {
-      var v = c[CODE_FIELDS[i]];
-      if (v != null && v !== '') return String(v);
-    }
-    return '';
+    return c.id != null ? String(c.id) : '';
   }
   function codeOf(r) {
     if (r == null) return '';
